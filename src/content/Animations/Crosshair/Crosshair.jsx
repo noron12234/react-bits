@@ -20,6 +20,7 @@ const Crosshair = ({ color = 'white', containerRef = null }) => {
   const lineVerticalRef = useRef(null);
   const filterXRef = useRef(null);
   const filterYRef = useRef(null);
+  const rafIdRef = useRef(null);
 
   let mouse = { x: 0, y: 0 };
 
@@ -63,7 +64,7 @@ const Crosshair = ({ color = 'white', containerRef = null }) => {
         opacity: 1
       });
 
-      requestAnimationFrame(render);
+      rafIdRef.current = requestAnimationFrame(render);
 
       target.removeEventListener('mousemove', onMouseMove);
     };
@@ -118,7 +119,7 @@ const Crosshair = ({ color = 'white', containerRef = null }) => {
         gsap.set(lineHorizontalRef.current, { y: renderedStyles.ty.previous });
       }
 
-      requestAnimationFrame(render);
+      rafIdRef.current = requestAnimationFrame(render);
     };
 
     const links = containerRef?.current ? containerRef.current.querySelectorAll('a') : document.querySelectorAll('a');
@@ -129,6 +130,7 @@ const Crosshair = ({ color = 'white', containerRef = null }) => {
     });
 
     return () => {
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
       target.removeEventListener('mousemove', handleMouseMove);
       target.removeEventListener('mousemove', onMouseMove);
       links.forEach(link => {

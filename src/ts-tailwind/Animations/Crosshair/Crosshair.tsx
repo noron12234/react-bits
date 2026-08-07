@@ -26,6 +26,7 @@ const Crosshair: React.FC<CrosshairProps> = ({ color = 'white', containerRef = n
   const lineVerticalRef = useRef<HTMLDivElement>(null);
   const filterXRef = useRef<SVGFETurbulenceElement>(null);
   const filterYRef = useRef<SVGFETurbulenceElement>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   let mouse = { x: 0, y: 0 };
 
@@ -70,7 +71,7 @@ const Crosshair: React.FC<CrosshairProps> = ({ color = 'white', containerRef = n
         opacity: 1
       });
 
-      requestAnimationFrame(render);
+      rafIdRef.current = requestAnimationFrame(render);
 
       target.removeEventListener('mousemove', onMouseMove);
     };
@@ -129,7 +130,7 @@ const Crosshair: React.FC<CrosshairProps> = ({ color = 'white', containerRef = n
         gsap.set(lineHorizontalRef.current, { y: renderedStyles.ty.previous });
       }
 
-      requestAnimationFrame(render);
+      rafIdRef.current = requestAnimationFrame(render);
     };
 
     const links: NodeListOf<HTMLAnchorElement> = containerRef?.current
@@ -142,6 +143,7 @@ const Crosshair: React.FC<CrosshairProps> = ({ color = 'white', containerRef = n
     });
 
     return () => {
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
       target.removeEventListener('mousemove', handleMouseMove);
       target.removeEventListener('mousemove', onMouseMove);
       links.forEach(link => {
